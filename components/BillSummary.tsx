@@ -136,7 +136,7 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Split Results</h2>
         <p className="text-gray-600">
-          Here's what everyone owes, including their fair share of tax and
+          Here&apos;s what everyone owes, including their fair share of tax and
           service charges
         </p>
       </div>
