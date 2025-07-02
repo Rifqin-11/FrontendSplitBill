@@ -238,7 +238,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                   <Input
                     id="tax"
                     type="number"
-                    step="0.1"
+                    step="1"
                     value={((billData.tax / billData.subtotal) * 100).toFixed(
                       1
                     )}
