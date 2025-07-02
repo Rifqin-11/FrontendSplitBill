@@ -64,10 +64,13 @@ export default function Home() {
       const formData = new FormData();
       formData.append("image", file); // ✅ cocok dengan backend
 
-      const response = await fetch("http://localhost:4000/api/receipt", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/receipt`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to process receipt");
 

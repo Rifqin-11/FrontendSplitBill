@@ -100,13 +100,16 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
 
   const shareResults = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/share", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ billData, people }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/share`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ billData, people }),
+        }
+      );
 
       const data = await response.json();
       const shareUrl = `${window.location.origin}/summary?id=${data.id}`;
