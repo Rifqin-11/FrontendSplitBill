@@ -15,7 +15,7 @@ interface PeopleManagerProps {
 }
 
 const colors = [
-  '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 
+  '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
   '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
 ];
 
@@ -39,7 +39,7 @@ export function PeopleManager({ people, setPeople, onNext, onBack }: PeopleManag
   };
 
   const updatePersonName = (id: string, name: string) => {
-    setPeople(people.map(person => 
+    setPeople(people.map(person =>
       person.id === id ? { ...person, name } : person
     ));
   };
@@ -57,7 +57,7 @@ export function PeopleManager({ people, setPeople, onNext, onBack }: PeopleManag
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Who's Splitting the Bill?</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Who&#39;s Splitting the Bill?</h2>
         <p className="text-gray-600">
           Add everyone who was part of this meal
         </p>
@@ -83,7 +83,7 @@ export function PeopleManager({ people, setPeople, onNext, onBack }: PeopleManag
 
           {people.map((person, index) => (
             <div key={person.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div 
+              <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                 style={{ backgroundColor: person.color }}
               >
@@ -149,8 +149,8 @@ export function PeopleManager({ people, setPeople, onNext, onBack }: PeopleManag
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to Edit
         </Button>
-        <Button 
-          onClick={onNext} 
+        <Button
+          onClick={onNext}
           className="flex-1"
           disabled={people.length === 0}
         >
