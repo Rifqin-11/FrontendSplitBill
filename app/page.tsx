@@ -88,7 +88,7 @@ export default function Home() {
         })),
         subtotal: extracted.parsed.subtotal,
         tax: extracted.parsed.tax,
-        serviceCharge: extracted.parsed.serviceCharge ?? 0,
+        serviceCharge: extracted.parsed.service_charge ?? 0,
         discount: extracted.parsed.discount ?? 0,
         total: extracted.parsed.total,
       };
