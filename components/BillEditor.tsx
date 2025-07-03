@@ -239,9 +239,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                     id="tax"
                     type="number"
                     step="1"
-                    value={((billData.tax / billData.subtotal) * 100).toFixed(
-                      1
-                    )}
+                    value={((billData.tax / billData.subtotal) * 100)}
                     onChange={(e) => {
                       const percentage = parseFloat(e.target.value) || 0;
                       const taxValue = (billData.subtotal * percentage) / 100;
