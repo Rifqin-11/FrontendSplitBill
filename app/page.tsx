@@ -334,7 +334,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         {currentStep !== "upload" && (
           <div className="max-w-4xl mx-auto mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white rounded-lg p-4 shadow-sm gap-4 sm:gap-0">
+            <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-between bg-white rounded-lg p-4 shadow-sm gap-4">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isActive = step.id === currentStep;
