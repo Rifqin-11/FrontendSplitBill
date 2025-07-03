@@ -113,7 +113,9 @@ export default function SummaryPage() {
   };
 
   const calculatePersonSummaries = (): PersonSummary[] => {
-    return people.map((person) => {
+    // 1️⃣ Hitung dulu per-person sama seperti di BillSummary.tsx,
+    //    termasuk memperhitungkan quantity * unit price:
+    const personSummaries = people.map((person) => {
       const personItems = billData!.items
         .filter((item) => item.assignedTo.includes(person.id))
         .map((item) => ({
@@ -128,10 +130,14 @@ export default function SummaryPage() {
         (sum, item) => sum + item.splitPrice,
         0
       );
-      const itemsProportion = itemsTotal / billData!.subtotal;
+
+      // proporsi berdasarkan subtotal
+      const itemsProportion =
+        billData!.subtotal > 0 ? itemsTotal / billData!.subtotal : 0;
       const taxPortion = billData!.tax * itemsProportion;
       const servicePortion = billData!.serviceCharge * itemsProportion;
       const discountPortion = billData!.discount * itemsProportion;
+
       const finalTotal =
         itemsTotal + taxPortion + servicePortion - discountPortion;
 
@@ -145,6 +151,33 @@ export default function SummaryPage() {
         finalTotal,
       };
     });
+
+    // 2️⃣ Hitung subtotal untuk item yang belum dibagikan
+    const unassignedItems = billData!.items.filter(
+      (item) => item.assignedTo.length === 0
+    );
+    const unassignedSubtotal = unassignedItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    // 3️⃣ Jika ada, hitung porsi pajak/service/discount, lalu bagi rata ke semua orang
+    if (unassignedSubtotal > 0 && billData!.subtotal > 0) {
+      const unassignedProportion = unassignedSubtotal / billData!.subtotal;
+      const unassignedTax = billData!.tax * unassignedProportion;
+      const unassignedSvc = billData!.serviceCharge * unassignedProportion;
+      const unassignedDisc = billData!.discount * unassignedProportion;
+
+      const totalUnassignedCost =
+        unassignedSubtotal + unassignedTax + unassignedSvc - unassignedDisc;
+
+      const sharePerPerson = totalUnassignedCost / people.length;
+      personSummaries.forEach((summary) => {
+        summary.finalTotal += sharePerPerson;
+      });
+    }
+
+    return personSummaries;
   };
 
   if (error) return <p className="text-red-500 text-center mt-10">{error}</p>;
