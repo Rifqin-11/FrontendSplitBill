@@ -259,7 +259,7 @@ export default function Home() {
               billData={billData}
               setBillData={setBillData}
               people={people}
-              onNext={() => setCurrentStep("summary")}
+              onNext={() => setCurrentStep("payment")}
               onBack={() => setCurrentStep("people")}
             />
           )
@@ -270,8 +270,8 @@ export default function Home() {
           <PaymentInfo
             paymentMethods={paymentMethods}
             setPaymentMethods={setPaymentMethods}
-            onNext={() => setCurrentStep("assign")}
-            onBack={() => setCurrentStep("people")}
+            onNext={() => setCurrentStep("summary")}
+            onBack={() => setCurrentStep("assign")}
           />
         );
 
