@@ -32,12 +32,12 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
   const calculatePersonSummaries = (): PersonSummary[] => {
     return people.map(person => {
       const personItems = billData.items
-        .filter(item => item.assignedTo.includes(person.id))
-        .map(item => ({
+        .filter((item) => item.assignedTo.includes(person.id))
+        .map((item) => ({
           name: item.name,
           quantity: item.quantity,
-          totalPrice: item.price * item.quantity,
-          splitPrice: (item.price * item.quantity) / item.assignedTo.length,
+          totalPrice: item.price,
+          splitPrice: item.price / item.assignedTo.length,
           sharedWith: item.assignedTo.length,
         }));
 
