@@ -123,7 +123,7 @@ export default function SummaryPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Split Results</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2 mt-4">Split Results</h2>
         <p className="text-gray-600">
           Here&apos;s what everyone owes, including their fair share of tax and
           service charges
@@ -131,7 +131,7 @@ export default function SummaryPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
+      <div className="grid md:grid-cols-3 gap-4 mb-8 mx-2">
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="pt-6">
             <div className="flex items-center">
