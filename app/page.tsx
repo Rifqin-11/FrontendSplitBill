@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Users, Calculator, Share2, ChevronRight, Receipt, Camera } from 'lucide-react';
+import { Upload, Users, Calculator, Share2, ChevronRight, Receipt, Camera, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BillEditor } from '@/components/BillEditor';
@@ -49,7 +49,7 @@ const steps = [
   { id: "edit", title: "Review & Edit", icon: Receipt },
   { id: "people", title: "Add People", icon: Users },
   { id: "assign", title: "Assign Items", icon: Calculator },
-  { id: "payment", title: "Payment Info", icon: Calculator },
+  { id: "payment", title: "Payment Info", icon: CreditCard },
   { id: "summary", title: "Split Results", icon: Share2 },
 ];
 
@@ -281,6 +281,7 @@ export default function Home() {
             <BillSummary
               billData={billData}
               people={people}
+              paymentMethods={paymentMethods}
               onStartOver={() => {
                 setCurrentStep("upload");
                 setBillData(null);

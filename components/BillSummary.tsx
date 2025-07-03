@@ -3,12 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Share2, Copy, RefreshCw, Receipt, DollarSign, Users } from 'lucide-react';
-import { BillData, Person } from '@/app/page';
+import { Share2, Copy, RefreshCw, Receipt, DollarSign, Users, CreditCard, Smartphone } from 'lucide-react';
+import { BillData, PaymentMethod, Person } from '@/app/page';
 
 interface BillSummaryProps {
   billData: BillData;
   people: Person[];
+  paymentMethods: PaymentMethod[];
   onStartOver: () => void;
 }
 
@@ -28,7 +29,7 @@ interface PersonSummary {
   finalTotal: number;
 }
 
-export function BillSummary({ billData, people, onStartOver }: BillSummaryProps) {
+export function BillSummary({ billData, people, paymentMethods, onStartOver }: BillSummaryProps) {
   const calculatePersonSummaries = (): PersonSummary[] => {
     // Langkah 1: Kalkulasi seperti biasa untuk item yang sudah dibagikan
     const personSummaries = people.map((person) => {
@@ -54,6 +55,7 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
       const discountPortion = billData.discount * itemsProportion;
       const finalTotal =
         itemsTotal + taxPortion + servicePortion - discountPortion;
+
 
       return {
         person,
@@ -108,6 +110,28 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
   const personSummaries = calculatePersonSummaries();
   const totalCheck = personSummaries.reduce((sum, summary) => sum + summary.finalTotal, 0);
 
+  const getPaymentMethodLabel = (method: PaymentMethod) => {
+    const labels: Record<string, string> = {
+      // E-wallets
+      gopay: "GoPay",
+      ovo: "OVO",
+      dana: "DANA",
+      shopeepay: "ShopeePay",
+      linkaja: "LinkAja",
+      jenius: "Jenius",
+      // Banks
+      bca: "BCA",
+      mandiri: "Bank Mandiri",
+      bni: "BNI",
+      bri: "BRI",
+      cimb: "CIMB Niaga",
+      permata: "Bank Permata",
+      danamon: "Bank Danamon",
+      maybank: "Maybank",
+    };
+    return labels[method.name] || method.name;
+  };
+
   const copyToClipboard = async () => {
     const summary = generateTextSummary();
     await navigator.clipboard.writeText(summary);
@@ -129,6 +153,14 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
 
     text += `Total Bill: ${formatRupiah(billData.total)}\n`;
     text += `Total Check: ${formatRupiah(totalCheck)}`;
+
+    if (paymentMethods.length > 0) {
+      text += "💳 Payment Methods:\n";
+      paymentMethods.forEach((method) => {
+        const label = getPaymentMethodLabel(method);
+        text += `${label}: ${method.number}\n`;
+      });
+    }
 
     return text;
   };
@@ -222,6 +254,42 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
           </CardContent>
         </Card>
       </div>
+
+      {/* Payment Methods */}
+      {paymentMethods.length > 0 && (
+        <Card className="mb-8 bg-purple-50 border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-purple-800">
+              <CreditCard className="h-5 w-5 mr-2" />
+              Payment Methods
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4">
+              {paymentMethods.map((method) => {
+                const Icon =
+                  method.type === "ewallet" ? Smartphone : CreditCard;
+                return (
+                  <div
+                    key={method.id}
+                    className="flex items-center p-3 bg-white rounded-lg border"
+                  >
+                    <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mr-3">
+                      <Icon className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {getPaymentMethodLabel(method)}
+                      </p>
+                      <p className="text-sm text-gray-600">{method.number}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Individual Summaries */}
       <div className="space-y-6 mb-8">

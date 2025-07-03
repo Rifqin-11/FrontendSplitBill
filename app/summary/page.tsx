@@ -4,7 +4,13 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Receipt, DollarSign, Users } from "lucide-react";
+import {
+  Receipt,
+  DollarSign,
+  Users,
+  Smartphone,
+  CreditCard,
+} from "lucide-react";
 
 interface BillData {
   subtotal: number;
@@ -24,6 +30,13 @@ interface Person {
   id: string;
   name: string;
   color: string;
+}
+
+interface PaymentMethod {
+  id: string;
+  type: "ewallet" | "bank";
+  name: string;
+  number: string;
 }
 
 interface PersonSummary {
@@ -48,6 +61,7 @@ export default function SummaryPage() {
 
   const [billData, setBillData] = useState<BillData | null>(null);
   const [people, setPeople] = useState<Person[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -60,6 +74,7 @@ export default function SummaryPage() {
         const json = await res.json();
         setBillData(json.billData);
         setPeople(json.people);
+        setPaymentMethods(json.paymentMethods || []);
       } catch (err) {
         console.error(err);
         setError("Gagal memuat data tagihan");
@@ -74,6 +89,26 @@ export default function SummaryPage() {
       currency: "IDR",
       minimumFractionDigits: 2,
     }).format(value);
+
+  const getPaymentMethodLabel = (method: PaymentMethod) => {
+    const labels: Record<string, string> = {
+      gopay: "GoPay",
+      ovo: "OVO",
+      dana: "DANA",
+      shopeepay: "ShopeePay",
+      linkaja: "LinkAja",
+      jenius: "Jenius",
+      bca: "BCA",
+      mandiri: "Bank Mandiri",
+      bni: "BNI",
+      bri: "BRI",
+      cimb: "CIMB Niaga",
+      permata: "Bank Permata",
+      danamon: "Bank Danamon",
+      maybank: "Maybank",
+    };
+    return labels[method.name] || method.name;
+  };
 
   const calculatePersonSummaries = (): PersonSummary[] => {
     return people.map((person) => {
@@ -121,17 +156,17 @@ export default function SummaryPage() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto px-4 mt-6 mb-10">
       <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2 mt-4">Split Results</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Split Results</h2>
         <p className="text-gray-600">
-          Here&apos;s what everyone owes, including their fair share of tax and
+          Here's what everyone owes, including their fair share of tax and
           service charges
         </p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8 mx-2">
+      <div className="grid md:grid-cols-3 gap-4 mb-8">
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="pt-6">
             <div className="flex items-center">
@@ -176,6 +211,42 @@ export default function SummaryPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Payment Methods */}
+      {paymentMethods.length > 0 && (
+        <Card className="mb-8 bg-purple-50 border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-purple-800">
+              <CreditCard className="h-5 w-5 mr-2" />
+              Payment Methods
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4">
+              {paymentMethods.map((method) => {
+                const Icon =
+                  method.type === "ewallet" ? Smartphone : CreditCard;
+                return (
+                  <div
+                    key={method.id}
+                    className="flex items-center p-3 bg-white rounded-lg border"
+                  >
+                    <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mr-3">
+                      <Icon className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {getPaymentMethodLabel(method)}
+                      </p>
+                      <p className="text-sm text-gray-600">{method.number}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Individual Summaries */}
       <div className="space-y-6 mb-8">

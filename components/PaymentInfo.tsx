@@ -48,6 +48,7 @@ const bankOptions = [
   { value: "permata", label: "Bank Permata" },
   { value: "danamon", label: "Bank Danamon" },
   { value: "maybank", label: "Maybank" },
+  { value: "other", label: "Other (Input manually)" },
 ];
 
 export function PaymentInfo({
@@ -61,17 +62,24 @@ export function PaymentInfo({
     name: "",
     number: "",
   });
+  const [manualBankName, setManualBankName] = useState("");
 
   const addPaymentMethod = () => {
-    if (newPayment.name && newPayment.number) {
+    const nameToUse =
+      newPayment.type === "bank" && newPayment.name === "other"
+        ? manualBankName
+        : newPayment.name;
+
+    if (nameToUse && newPayment.number) {
       const newMethod: PaymentMethod = {
         id: Date.now().toString(),
         type: newPayment.type,
-        name: newPayment.name,
+        name: nameToUse,
         number: newPayment.number,
       };
       setPaymentMethods([...paymentMethods, newMethod]);
       setNewPayment({ type: "ewallet", name: "", number: "" });
+      setManualBankName("");
     }
   };
 
@@ -192,9 +200,10 @@ export function PaymentInfo({
                   <Label htmlFor="payment-type">Payment Type</Label>
                   <Select
                     value={newPayment.type}
-                    onValueChange={(value: "ewallet" | "bank") =>
-                      setNewPayment({ ...newPayment, type: value, name: "" })
-                    }
+                    onValueChange={(value: "ewallet" | "bank") => {
+                      setNewPayment({ ...newPayment, type: value, name: "" });
+                      setManualBankName("");
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -213,9 +222,10 @@ export function PaymentInfo({
                   </Label>
                   <Select
                     value={newPayment.name}
-                    onValueChange={(value) =>
-                      setNewPayment({ ...newPayment, name: value })
-                    }
+                    onValueChange={(value) => {
+                      setNewPayment({ ...newPayment, name: value });
+                      if (value !== "other") setManualBankName("");
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -232,6 +242,19 @@ export function PaymentInfo({
                       ))}
                     </SelectContent>
                   </Select>
+
+                  {newPayment.type === "bank" &&
+                    newPayment.name === "other" && (
+                      <div className="mt-2">
+                        <Label htmlFor="manual-bank-name">Bank Name</Label>
+                        <Input
+                          id="manual-bank-name"
+                          placeholder="Enter bank name"
+                          value={manualBankName}
+                          onChange={(e) => setManualBankName(e.target.value)}
+                        />
+                      </div>
+                    )}
                 </div>
               </div>
               <div>
@@ -255,7 +278,12 @@ export function PaymentInfo({
               </div>
               <Button
                 onClick={addPaymentMethod}
-                disabled={!newPayment.name || !newPayment.number}
+                disabled={
+                  !newPayment.number ||
+                  (newPayment.type === "bank" && newPayment.name === "other"
+                    ? !manualBankName
+                    : !newPayment.name)
+                }
                 className="w-full"
                 variant="outline"
               >
