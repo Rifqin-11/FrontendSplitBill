@@ -332,7 +332,7 @@ export function PaymentInfo({
           Back to People
         </Button>
         <Button onClick={onNext} className="flex-1">
-          Skip, View Split Results
+          View Split Results
           <ArrowRight className="h-5 w-5 ml-2" />
         </Button>
       </div>
