@@ -176,7 +176,7 @@ export function BillSummary({ billData, people, paymentMethods, onStartOver }: B
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ billData, people }),
+          body: JSON.stringify({ billData, people, paymentMethods }),
         }
       );
 
