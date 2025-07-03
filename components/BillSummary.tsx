@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Share2, Copy, RefreshCw, Receipt, DollarSign, Users, CreditCard, Smartphone } from 'lucide-react';
 import { BillData, PaymentMethod, Person } from '@/app/page';
+import { toast } from '@/hooks/use-toast';
 
 interface BillSummaryProps {
   billData: BillData;
@@ -191,11 +192,18 @@ export function BillSummary({ billData, people, paymentMethods, onStartOver }: B
         });
       } else {
         await navigator.clipboard.writeText(shareUrl);
-        alert("Link copied to clipboard: " + shareUrl);
+        toast({
+          title: "Link Copied!",
+          description: "The link has been copied to your clipboard.",
+        });
       }
     } catch (error) {
       console.error("Failed to share:", error);
-      alert("Failed to share result");
+      toast({
+        title: "Error",
+        description: "Failed to share result. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
