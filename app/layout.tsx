@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Split Bill Receipt - Bagi Tagihan Otomatis dari Struk",
   description:
     "Aplikasi web pintar untuk membagi tagihan restoran secara otomatis dari struk belanja. Unggah struk, tetapkan item ke orang, dan hitung pembagian biaya dengan mudah dan adil.",
+  icons: {
+    icon: "/favicon.png",
+  },
   keywords: [
     "split bill",
     "bagi tagihan",
