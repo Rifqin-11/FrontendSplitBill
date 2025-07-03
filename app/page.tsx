@@ -332,51 +332,43 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         {currentStep !== "upload" && (
           <div className="max-w-4xl mx-auto mb-8">
-            <div className="bg-white rounded-lg p-4 shadow-sm overflow-x-auto">
-              <div className="flex items-center gap-x-4 gap-y-2 flex-wrap min-w-full">
-                {steps.map((step, index) => {
-                  const Icon = step.icon;
-                  const isActive = step.id === currentStep;
-                  const isCompleted =
-                    steps.findIndex((s) => s.id === currentStep) > index;
+            <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
+              {steps.map((step, index) => {
+                const Icon = step.icon;
+                const isActive = step.id === currentStep;
+                const isCompleted =
+                  steps.findIndex((s) => s.id === currentStep) > index;
 
-                  return (
+                return (
+                  <div key={step.id} className="flex items-center">
                     <div
-                      key={step.id}
-                      className="flex items-center space-x-2 shrink-0"
+                      className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                        isActive
+                          ? "bg-blue-600 text-white"
+                          : isCompleted
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-200 text-gray-500"
+                      }`}
                     >
-                      <div
-                        className={`flex items-center justify-center rounded-full text-white text-xs md:text-sm
-                  ${
-                    isActive
-                      ? "bg-blue-600"
-                      : isCompleted
-                      ? "bg-green-500"
-                      : "bg-gray-300 text-gray-600"
-                  }
-                  w-8 h-8 md:w-10 md:h-10
-                `}
-                      >
-                        <Icon className="w-4 h-4 md:w-5 md:h-5" />
-                      </div>
-                      <span
-                        className={`text-xs md:text-sm font-medium ${
-                          isActive
-                            ? "text-blue-600"
-                            : isCompleted
-                            ? "text-green-600"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        {step.title}
-                      </span>
-                      {index < steps.length - 1 && (
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
-                      )}
+                      <Icon className="h-5 w-5" />
                     </div>
-                  );
-                })}
-              </div>
+                    <span
+                      className={`ml-2 font-medium ${
+                        isActive
+                          ? "text-blue-600"
+                          : isCompleted
+                          ? "text-green-600"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {step.title}
+                    </span>
+                    {index < steps.length - 1 && (
+                      <ChevronRight className="h-5 w-5 text-gray-400 ml-4" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
