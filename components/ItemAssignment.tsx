@@ -241,7 +241,7 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
           className="flex-1"
           disabled={!allItemsAssigned}
         >
-          View Split Results
+          Add Payment Info
           <ArrowRight className="h-5 w-5 ml-2" />
         </Button>
       </div>
