@@ -121,8 +121,8 @@ export default function SummaryPage() {
         .map((item) => ({
           name: item.name,
           quantity: item.quantity,
-          totalPrice: item.price * item.quantity,
-          splitPrice: (item.price * item.quantity) / item.assignedTo.length,
+          totalPrice: item.price,
+          splitPrice: item.price / item.assignedTo.length,
           sharedWith: item.assignedTo.length,
         }));
 
