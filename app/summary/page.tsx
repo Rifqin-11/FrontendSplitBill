@@ -106,6 +106,8 @@ export default function SummaryPage() {
       permata: "Bank Permata",
       danamon: "Bank Danamon",
       maybank: "Maybank",
+      linebank: "Line Bank",
+      bankjago: "Bank Jago",
     };
     return labels[method.name] || method.name;
   };

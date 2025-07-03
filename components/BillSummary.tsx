@@ -128,6 +128,8 @@ export function BillSummary({ billData, people, paymentMethods, onStartOver }: B
       permata: "Bank Permata",
       danamon: "Bank Danamon",
       maybank: "Maybank",
+      linebank: "Line Bank",
+      bankjago: "Bank Jago",
     };
     return labels[method.name] || method.name;
   };

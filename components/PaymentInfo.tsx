@@ -48,6 +48,8 @@ const bankOptions = [
   { value: "permata", label: "Bank Permata" },
   { value: "danamon", label: "Bank Danamon" },
   { value: "maybank", label: "Maybank" },
+  { value: "linebank", label: "Line Bank" },
+  { value: "bankjago", label: "Bank Jago" },
   { value: "other", label: "Other (Input manually)" },
 ];
 
