@@ -334,7 +334,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         {currentStep !== "upload" && (
           <div className="max-w-4xl mx-auto mb-8">
-            <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white rounded-lg p-4 shadow-sm gap-4 sm:gap-0">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isActive = step.id === currentStep;
@@ -344,7 +344,7 @@ export default function Home() {
                 return (
                   <div key={step.id} className="flex items-center">
                     <div
-                      className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                      className={`flex items-center justify-center w-10 h-10 rounded-full shrink-0 ${
                         isActive
                           ? "bg-blue-600 text-white"
                           : isCompleted
@@ -355,7 +355,7 @@ export default function Home() {
                       <Icon className="h-5 w-5" />
                     </div>
                     <span
-                      className={`ml-2 font-medium ${
+                      className={`ml-2 text-sm font-medium ${
                         isActive
                           ? "text-blue-600"
                           : isCompleted
@@ -366,7 +366,7 @@ export default function Home() {
                       {step.title}
                     </span>
                     {index < steps.length - 1 && (
-                      <ChevronRight className="h-5 w-5 text-gray-400 ml-4" />
+                      <ChevronRight className="h-5 w-5 text-gray-400 ml-2 hidden sm:inline" />
                     )}
                   </div>
                 );
