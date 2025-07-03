@@ -125,8 +125,8 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
                 <div>
                   <CardTitle className="text-lg">{item.name}</CardTitle>
                   <p className="text-gray-600">
-                    {formatRupiah(item.price)} × {item.quantity} ={" "}
-                    {formatRupiah(item.price * item.quantity)}
+                    {formatRupiah(item.price_per_item)} × {item.quantity} ={" "}
+                    {formatRupiah(item.price_per_item * item.quantity)}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -216,7 +216,7 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
                       {formatRupiah(
-                        ((item.price * item.quantity) /
+                        ((item.price_per_item * item.quantity) /
                           item.assignedTo.length) *
                           ((billData.subtotal - billData.discount) /
                             billData.subtotal)
