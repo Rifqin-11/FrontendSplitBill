@@ -292,11 +292,11 @@ export function BillEditor({
                   <Input
                     id="tax"
                     type="number"
-                    step="0.1"
+                    step="1"
                     // Menampilkan nilai pajak sebagai persen. Mencegah error jika subtotal 0.
                     value={
                       billData.subtotal > 0
-                        ? ((billData.tax / billData.subtotal) * 100).toFixed(1)
+                        ? ((billData.tax / billData.subtotal) * 100)
                         : 0
                     }
                     onChange={(e) => {
