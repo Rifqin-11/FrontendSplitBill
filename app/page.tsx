@@ -8,6 +8,7 @@ import { BillEditor } from '@/components/BillEditor';
 import { PeopleManager } from '@/components/PeopleManager';
 import { ItemAssignment } from '@/components/ItemAssignment';
 import { BillSummary } from '@/components/BillSummary';
+import { PaymentInfo } from '@/components/PaymentInfo';
 
 export interface BillItem {
   id: string;
@@ -18,6 +19,13 @@ export interface BillItem {
   discount?: number;
   assignedTo: string[];
 
+}
+
+export interface PaymentMethod {
+  id: string;
+  type: "ewallet" | "bank";
+  name: string;
+  number: string;
 }
 
 export interface Person {
@@ -37,11 +45,12 @@ export interface BillData {
 }
 
 const steps = [
-  { id: 'upload', title: 'Upload Receipt', icon: Upload },
-  { id: 'edit', title: 'Review & Edit', icon: Receipt },
-  { id: 'people', title: 'Add People', icon: Users },
-  { id: 'assign', title: 'Assign Items', icon: Calculator },
-  { id: 'summary', title: 'Split Results', icon: Share2 },
+  { id: "upload", title: "Upload Receipt", icon: Upload },
+  { id: "edit", title: "Review & Edit", icon: Receipt },
+  { id: "people", title: "Add People", icon: Users },
+  { id: "assign", title: "Assign Items", icon: Calculator },
+  { id: "payment", title: "Payment Info", icon: Calculator },
+  { id: "summary", title: "Split Results", icon: Share2 },
 ];
 
 
@@ -50,6 +59,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [currentStep, setCurrentStep] = useState('upload');
   const [billData, setBillData] = useState<BillData | null>(null);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
@@ -134,7 +144,7 @@ export default function Home() {
 
   const renderCurrentStep = () => {
     switch (currentStep) {
-      case 'upload':
+      case "upload":
         return (
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
@@ -220,49 +230,65 @@ export default function Home() {
           </div>
         );
 
-      case 'edit':
-        return billData && (
-          <BillEditor
-            billData={billData}
-            setBillData={setBillData}
-            onNext={() => setCurrentStep('people')}
-            uploadedImage={uploadedImage}
-          />
+      case "edit":
+        return (
+          billData && (
+            <BillEditor
+              billData={billData}
+              setBillData={setBillData}
+              onNext={() => setCurrentStep("people")}
+              uploadedImage={uploadedImage}
+            />
+          )
         );
 
-      case 'people':
+      case "people":
         return (
           <PeopleManager
             people={people}
             setPeople={setPeople}
-            onNext={() => setCurrentStep('assign')}
-            onBack={() => setCurrentStep('edit')}
+            onNext={() => setCurrentStep("assign")}
+            onBack={() => setCurrentStep("edit")}
           />
         );
 
-      case 'assign':
-        return billData && (
-          <ItemAssignment
-            billData={billData}
-            setBillData={setBillData}
-            people={people}
-            onNext={() => setCurrentStep('summary')}
-            onBack={() => setCurrentStep('people')}
+      case "assign":
+        return (
+          billData && (
+            <ItemAssignment
+              billData={billData}
+              setBillData={setBillData}
+              people={people}
+              onNext={() => setCurrentStep("summary")}
+              onBack={() => setCurrentStep("people")}
+            />
+          )
+        );
+
+      case "payment":
+        return (
+          <PaymentInfo
+            paymentMethods={paymentMethods}
+            setPaymentMethods={setPaymentMethods}
+            onNext={() => setCurrentStep("assign")}
+            onBack={() => setCurrentStep("people")}
           />
         );
 
-      case 'summary':
-        return billData && (
-          <BillSummary
-            billData={billData}
-            people={people}
-            onStartOver={() => {
-              setCurrentStep('upload');
-              setBillData(null);
-              setPeople([]);
-              setUploadedImage(null);
-            }}
-          />
+      case "summary":
+        return (
+          billData && (
+            <BillSummary
+              billData={billData}
+              people={people}
+              onStartOver={() => {
+                setCurrentStep("upload");
+                setBillData(null);
+                setPeople([]);
+                setUploadedImage(null);
+              }}
+            />
+          )
         );
 
       default:
