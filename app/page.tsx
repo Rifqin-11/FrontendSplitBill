@@ -14,6 +14,7 @@ export interface BillItem {
   name: string;
   quantity: number;
   price: number;
+  price_per_item: number; // optional, calculated field
   discount?: number;
   assignedTo: string[];
 
@@ -81,6 +82,7 @@ export default function Home() {
           id: String(index + 1),
           name: item.name,
           quantity: item.quantity,
+          price_per_item: item.price_per_item,
           price: item.price,
           assignedTo: [],
         })),

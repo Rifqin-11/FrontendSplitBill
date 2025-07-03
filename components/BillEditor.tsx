@@ -1,13 +1,20 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Pencil, Plus, Trash2, Receipt, ArrowRight, CircleCheck } from 'lucide-react';
-import { BillData, BillItem } from '@/app/page';
-import Image from 'next/image';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Pencil,
+  Plus,
+  Trash2,
+  Receipt,
+  ArrowRight,
+  CircleCheck,
+} from "lucide-react";
+import { BillData, BillItem } from "@/app/page"; // Pastikan path ini benar
+import Image from "next/image";
 
 interface BillEditorProps {
   billData: BillData;
@@ -16,69 +23,113 @@ interface BillEditorProps {
   uploadedImage: string | null;
 }
 
-export function BillEditor({ billData, setBillData, onNext, uploadedImage }: BillEditorProps) {
+export function BillEditor({
+  billData,
+  setBillData,
+  onNext,
+  uploadedImage,
+}: BillEditorProps) {
   const [editingItem, setEditingItem] = useState<string | null>(null);
 
+  // ✅ FUNGSI YANG DIPERBARUI: Menghitung ulang total secara otomatis
   const updateItem = (
     id: string,
     field: keyof BillItem,
     value: string | number
   ) => {
-    const updatedItems = billData.items.map((item) =>
-      item.id === id ? { ...item, [field]: value } : item
-    );
+    const updatedItems = billData.items.map((item) => {
+      if (item.id === id) {
+        const newItem = { ...item };
 
-    const newSubtotal = updatedItems.reduce((sum, item) => {
-      const discount = item.discount ?? 0;
-      const itemTotal = item.price * item.quantity * (1 - discount / 100);
-      return sum + itemTotal;
-    }, 0);
+        // Logika cerdas untuk menangani perubahan
+        if (field === "quantity" && typeof value === "number") {
+          newItem.quantity = value;
+          newItem.price = newItem.price_per_item * value; // Hitung ulang harga total
+        } else if (field === "price_per_item" && typeof value === "number") {
+          newItem.price_per_item = value;
+          newItem.price = newItem.quantity * value; // Hitung ulang harga total
+        } else if (field === "name" && typeof value === "string") {
+          newItem.name = value;
+        }
 
-    const newTotal = newSubtotal + billData.tax + billData.serviceCharge - billData.discount;
+        return newItem;
+      }
+      return item;
+    });
 
+    // Kalkulasi ulang subtotal dan total setelah item diubah
+    recalculateTotals(updatedItems);
+  };
+
+  // ✅ FUNGSI YANG DIPERBARUI: Kalkulasi subtotal dan total yang benar
+  const recalculateTotals = (
+    items: BillItem[],
+    newTax?: number,
+    newService?: number,
+    newDiscount?: number
+  ) => {
+    const currentTax = newTax ?? billData.tax;
+    const currentService = newService ?? billData.serviceCharge;
+    const currentDiscount = newDiscount ?? billData.discount;
+
+    const newSubtotal = items.reduce((sum, item) => sum + item.price, 0);
+    const newTotal =
+      newSubtotal + currentTax + currentService - currentDiscount;
 
     setBillData({
       ...billData,
-      items: updatedItems,
+      items,
       subtotal: newSubtotal,
       total: newTotal,
+      tax: currentTax,
+      serviceCharge: currentService,
+      discount: currentDiscount,
     });
   };
 
+  // ✅ FUNGSI YANG DIPERBARUI: Menggunakan fungsi kalkulasi terpusat
   const deleteItem = (id: string) => {
-    const updatedItems = billData.items.filter(item => item.id !== id);
-    const newSubtotal = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const newTotal = newSubtotal + billData.tax + billData.serviceCharge;
-
-    setBillData({
-      ...billData,
-      items: updatedItems,
-      subtotal: newSubtotal,
-      total: newTotal,
-    });
+    const updatedItems = billData.items.filter((item) => item.id !== id);
+    recalculateTotals(updatedItems);
   };
 
+  // ✅ FUNGSI YANG DIPERBARUI: Menambahkan price_per_item
   const addNewItem = () => {
     const newItem: BillItem = {
       id: Date.now().toString(),
-      name: 'New Item',
+      name: "New Item",
       quantity: 1,
+      price_per_item: 0,
       price: 0,
       assignedTo: [],
     };
-
-    setBillData({
-      ...billData,
-      items: [...billData.items, newItem],
-    });
-
+    const updatedItems = [...billData.items, newItem];
+    recalculateTotals(updatedItems);
     setEditingItem(newItem.id);
   };
 
-  const updateTaxAndService = (field: 'tax' | 'serviceCharge', value: number) => {
-    const newData = { ...billData, [field]: value };
-    newData.total = newData.subtotal + newData.tax + newData.serviceCharge;
-    setBillData(newData);
+  // ✅ FUNGSI YANG DIPERBARUI: Menggunakan fungsi kalkulasi terpusat
+  const updateTaxAndService = (
+    field: "tax" | "serviceCharge" | "discount",
+    value: number
+  ) => {
+    if (field === "tax") {
+      recalculateTotals(
+        billData.items,
+        value,
+        billData.serviceCharge,
+        billData.discount
+      );
+    } else if (field === "serviceCharge") {
+      recalculateTotals(billData.items, billData.tax, value, billData.discount);
+    } else if (field === "discount") {
+      recalculateTotals(
+        billData.items,
+        billData.tax,
+        billData.serviceCharge,
+        value
+      );
+    }
   };
 
   return (
@@ -106,7 +157,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                 src={uploadedImage}
                 alt="Uploaded receipt"
                 width={600}
-                height={400}
+                height={800}
                 className="w-full h-auto rounded-lg shadow-sm"
               />
             </CardContent>
@@ -151,20 +202,21 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                               className="w-full"
                             />
                           </div>
+                          {/* ✅ INPUT DIUBAH: Mengedit harga satuan */}
                           <div className="w-full flex flex-row gap-2 items-center">
-                            <p className="w-1/3">Price:</p>
+                            <p className="w-1/3">Price/item:</p>
                             <Input
                               type="number"
                               step="1"
-                              value={item.price}
+                              value={item.price_per_item}
                               onChange={(e) =>
                                 updateItem(
                                   item.id,
-                                  "price",
+                                  "price_per_item",
                                   parseFloat(e.target.value) || 0
                                 )
                               }
-                              placeholder="Price"
+                              placeholder="Price per item"
                               className="w-full"
                             />
                           </div>
@@ -175,17 +227,20 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                         <div className="font-medium text-gray-900">
                           {item.name}
                         </div>
+                        {/* ✅ TAMPILAN DIUBAH: Menampilkan kalkulasi yang benar */}
                         <div className="text-sm text-gray-600">
                           Qty: {item.quantity} ×{" "}
                           {new Intl.NumberFormat("id-ID", {
                             style: "currency",
                             currency: "IDR",
-                          }).format(item.price)}{" "}
+                            minimumFractionDigits: 0,
+                          }).format(item.price_per_item)}{" "}
                           ={" "}
                           {new Intl.NumberFormat("id-ID", {
                             style: "currency",
                             currency: "IDR",
-                          }).format(item.quantity * item.price)}
+                            minimumFractionDigits: 0,
+                          }).format(item.price)}
                         </div>
                       </div>
                     )}
@@ -215,7 +270,6 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                   </div>
                 </div>
               ))}
-
               <Button
                 variant="outline"
                 onClick={addNewItem}
@@ -234,17 +288,18 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="tax">Tax/PPN (%)</Label>
+                  <Label htmlFor="tax">Tax Value</Label>
                   <Input
                     id="tax"
                     type="number"
                     step="1"
-                    value={((billData.tax / billData.subtotal) * 100)}
-                    onChange={(e) => {
-                      const percentage = parseFloat(e.target.value) || 0;
-                      const taxValue = (billData.subtotal * percentage) / 100;
-                      updateTaxAndService("tax", taxValue);
-                    }}
+                    value={billData.tax}
+                    onChange={(e) =>
+                      updateTaxAndService(
+                        "tax",
+                        parseFloat(e.target.value) || 0
+                      )
+                    }
                   />
                 </div>
                 <div>
@@ -269,19 +324,12 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                     type="number"
                     step="1"
                     value={billData.discount}
-                    onChange={(e) => {
-                      const discountValue = parseFloat(e.target.value) || 0;
-                      const newTotal =
-                        billData.subtotal +
-                        billData.tax +
-                        billData.serviceCharge -
-                        discountValue;
-                      setBillData({
-                        ...billData,
-                        discount: discountValue,
-                        total: newTotal,
-                      });
-                    }}
+                    onChange={(e) =>
+                      updateTaxAndService(
+                        "discount",
+                        parseFloat(e.target.value) || 0
+                      )
+                    }
                   />
                 </div>
               </div>
@@ -297,6 +345,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
+                      minimumFractionDigits: 0,
                     }).format(billData.subtotal)}
                   </span>
                 </div>
@@ -307,6 +356,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
+                      minimumFractionDigits: 0,
                     }).format(billData.discount)}
                   </span>
                 </div>
@@ -316,6 +366,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
+                      minimumFractionDigits: 0,
                     }).format(billData.tax)}
                   </span>
                 </div>
@@ -325,6 +376,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
+                      minimumFractionDigits: 0,
                     }).format(billData.serviceCharge)}
                   </span>
                 </div>
@@ -334,6 +386,7 @@ export function BillEditor({ billData, setBillData, onNext, uploadedImage }: Bil
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
+                      minimumFractionDigits: 0,
                     }).format(billData.total)}
                   </span>
                 </div>
