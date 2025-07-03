@@ -9,6 +9,7 @@ import { PeopleManager } from '@/components/PeopleManager';
 import { ItemAssignment } from '@/components/ItemAssignment';
 import { BillSummary } from '@/components/BillSummary';
 import { PaymentInfo } from '@/components/PaymentInfo';
+import { toast } from 'sonner';
 
 export interface BillItem {
   id: string;
@@ -108,7 +109,7 @@ export default function Home() {
       setCurrentStep("edit");
     } catch (error) {
       console.error("OCR extraction failed:", error);
-      alert("Failed to process receipt. Please try again.");
+      toast.error("Failed to process receipt. Please try again.");
     }
   };
 
