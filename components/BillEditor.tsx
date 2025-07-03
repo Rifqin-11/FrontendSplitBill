@@ -288,18 +288,25 @@ export function BillEditor({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="tax">Tax Value</Label>
+                  <Label htmlFor="tax">Tax/PPN (%)</Label>
                   <Input
                     id="tax"
                     type="number"
-                    step="1"
-                    value={billData.tax}
-                    onChange={(e) =>
-                      updateTaxAndService(
-                        "tax",
-                        parseFloat(e.target.value) || 0
-                      )
+                    step="0.1"
+                    // Menampilkan nilai pajak sebagai persen. Mencegah error jika subtotal 0.
+                    value={
+                      billData.subtotal > 0
+                        ? ((billData.tax / billData.subtotal) * 100).toFixed(1)
+                        : 0
                     }
+                    onChange={(e) => {
+                      const percentage = parseFloat(e.target.value) || 0;
+                      // Hitung nilai pajak absolut dari persen yang dimasukkan
+                      const newTaxValue =
+                        (billData.subtotal * percentage) / 100;
+                      // Panggil fungsi update terpusat
+                      updateTaxAndService("tax", newTaxValue);
+                    }}
                   />
                 </div>
                 <div>
