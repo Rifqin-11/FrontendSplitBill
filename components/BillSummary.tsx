@@ -30,7 +30,8 @@ interface PersonSummary {
 
 export function BillSummary({ billData, people, onStartOver }: BillSummaryProps) {
   const calculatePersonSummaries = (): PersonSummary[] => {
-    return people.map(person => {
+    // Langkah 1: Kalkulasi seperti biasa untuk item yang sudah dibagikan
+    const personSummaries = people.map((person) => {
       const personItems = billData.items
         .filter((item) => item.assignedTo.includes(person.id))
         .map((item) => ({
@@ -41,15 +42,18 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
           sharedWith: item.assignedTo.length,
         }));
 
-      const itemsTotal = personItems.reduce((sum, item) => sum + item.splitPrice, 0);
+      const itemsTotal = personItems.reduce(
+        (sum, item) => sum + item.splitPrice,
+        0
+      );
 
-      // Calculate proportional tax and service charge
-      const itemsProportion = itemsTotal / billData.subtotal;
+      const itemsProportion =
+        billData.subtotal > 0 ? itemsTotal / billData.subtotal : 0;
       const taxPortion = billData.tax * itemsProportion;
       const servicePortion = billData.serviceCharge * itemsProportion;
       const discountPortion = billData.discount * itemsProportion;
-      const finalTotal = itemsTotal + taxPortion + servicePortion - discountPortion;
-
+      const finalTotal =
+        itemsTotal + taxPortion + servicePortion - discountPortion;
 
       return {
         person,
@@ -61,6 +65,37 @@ export function BillSummary({ billData, people, onStartOver }: BillSummaryProps)
         discountPortion,
       };
     });
+
+    // ✅ LANGKAH 2: Hitung total biaya dari semua item yang BELUM DIBAGIKAN
+    const unassignedItems = billData.items.filter(
+      (item) => item.assignedTo.length === 0
+    );
+    const unassignedSubtotal = unassignedItems.reduce(
+      (sum, item) => sum + item.price,
+      0
+    );
+
+    if (unassignedSubtotal > 0 && billData.subtotal > 0) {
+      const unassignedProportion = unassignedSubtotal / billData.subtotal;
+      const unassignedTax = billData.tax * unassignedProportion;
+      const unassignedService = billData.serviceCharge * unassignedProportion;
+      const unassignedDiscount = billData.discount * unassignedProportion;
+      const totalUnassignedCost =
+        unassignedSubtotal +
+        unassignedTax +
+        unassignedService -
+        unassignedDiscount;
+
+      // ✅ LANGKAH 3: Bagi biaya item tak terbagi secara merata ke semua orang
+      if (people.length > 0) {
+        const shareOfUnassignedCost = totalUnassignedCost / people.length;
+        personSummaries.forEach((summary) => {
+          summary.finalTotal += shareOfUnassignedCost;
+        });
+      }
+    }
+
+    return personSummaries;
   };
 
   const formatRupiah = (value: number) =>
