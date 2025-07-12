@@ -42,15 +42,7 @@ export const metadata: Metadata = {
     ],
     locale: "id_ID",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Split Bill Receipt",
-    description:
-      "Bagi tagihan restoran secara otomatis hanya dengan upload struk belanja. Praktis, cepat, dan adil.",
-    creator: "@rifqinaufal", // opsional, jika punya
-    images: ["https://splitbill.rifqinaufal11.studio/og-image.jpg"],
-  },
+  }
 };
 
 

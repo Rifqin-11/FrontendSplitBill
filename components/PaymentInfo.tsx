@@ -66,6 +66,7 @@ export function PaymentInfo({
   });
   const [manualBankName, setManualBankName] = useState("");
 
+  // Function to add a new payment method
   const addPaymentMethod = () => {
     const nameToUse =
       newPayment.type === "bank" && newPayment.name === "other"
@@ -85,10 +86,12 @@ export function PaymentInfo({
     }
   };
 
+  // Function to remove a payment method by ID
   const removePaymentMethod = (id: string) => {
     setPaymentMethods(paymentMethods.filter((method) => method.id !== id));
   };
 
+  // Function to update a specific field of a payment method
   const updatePaymentMethod = (
     id: string,
     field: keyof PaymentMethod,
@@ -128,6 +131,7 @@ export function PaymentInfo({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* payment methods not assigned */}
           {paymentMethods.length === 0 && (
             <div className="text-center py-8">
               <Wallet className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -297,6 +301,7 @@ export function PaymentInfo({
         </CardContent>
       </Card>
 
+      {/* Display added payment methods */}
       {paymentMethods.length > 0 && (
         <Card className="mb-6 bg-blue-50 border-blue-200">
           <CardContent className="pt-6">

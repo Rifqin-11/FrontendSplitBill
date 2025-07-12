@@ -32,7 +32,7 @@ interface PersonSummary {
 
 export function BillSummary({ billData, people, paymentMethods, onStartOver }: BillSummaryProps) {
   const calculatePersonSummaries = (): PersonSummary[] => {
-    // Langkah 1: Kalkulasi seperti biasa untuk item yang sudah dibagikan
+    // calculate individual summaries for each person
     const personSummaries = people.map((person) => {
       const personItems = billData.items
         .filter((item) => item.assignedTo.includes(person.id))
@@ -69,7 +69,7 @@ export function BillSummary({ billData, people, paymentMethods, onStartOver }: B
       };
     });
 
-    // ✅ LANGKAH 2: Hitung total biaya dari semua item yang BELUM DIBAGIKAN
+    // calculate unassigned items and their costs
     const unassignedItems = billData.items.filter(
       (item) => item.assignedTo.length === 0
     );
@@ -89,7 +89,7 @@ export function BillSummary({ billData, people, paymentMethods, onStartOver }: B
         unassignedService -
         unassignedDiscount;
 
-      // ✅ LANGKAH 3: Bagi biaya item tak terbagi secara merata ke semua orang
+      // distribute unassigned costs evenly among all people
       if (people.length > 0) {
         const shareOfUnassignedCost = totalUnassignedCost / people.length;
         personSummaries.forEach((summary) => {
@@ -138,9 +138,13 @@ export function BillSummary({ billData, people, paymentMethods, onStartOver }: B
   const copyToClipboard = async () => {
     const summary = generateTextSummary();
     await navigator.clipboard.writeText(summary);
-    // You could add a toast notification here
+    toast({
+      title: "Summary Copied!",
+      description: "The summary has been copied to your clipboard.",
+    });
   };
 
+  // Function to generate text summary of the bill split
   const generateTextSummary = () => {
     let text = '💰 Bill Split Summary\n\n';
 
@@ -168,6 +172,7 @@ export function BillSummary({ billData, people, paymentMethods, onStartOver }: B
     return text;
   };
 
+  // Function to share results via Web Share API or clipboard
   const shareResults = async () => {
     try {
       const response = await fetch(

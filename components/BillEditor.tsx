@@ -13,7 +13,7 @@ import {
   ArrowRight,
   CircleCheck,
 } from "lucide-react";
-import { BillData, BillItem } from "@/app/page"; // Pastikan path ini benar
+import { BillData, BillItem } from "@/app/page";
 import Image from "next/image";
 
 interface BillEditorProps {
@@ -31,7 +31,6 @@ export function BillEditor({
 }: BillEditorProps) {
   const [editingItem, setEditingItem] = useState<string | null>(null);
 
-  // ✅ FUNGSI YANG DIPERBARUI: Menghitung ulang total secara otomatis
   const updateItem = (
     id: string,
     field: keyof BillItem,
@@ -41,13 +40,13 @@ export function BillEditor({
       if (item.id === id) {
         const newItem = { ...item };
 
-        // Logika cerdas untuk menangani perubahan
+        // update the specific field based on the type
         if (field === "quantity" && typeof value === "number") {
           newItem.quantity = value;
-          newItem.price = newItem.price_per_item * value; // Hitung ulang harga total
+          newItem.price = newItem.price_per_item * value; // calculate total price based on quantity and price per item
         } else if (field === "price_per_item" && typeof value === "number") {
           newItem.price_per_item = value;
-          newItem.price = newItem.quantity * value; // Hitung ulang harga total
+          newItem.price = newItem.quantity * value; // calculate total price based on quantity and price per item
         } else if (field === "name" && typeof value === "string") {
           newItem.name = value;
         }
@@ -57,11 +56,11 @@ export function BillEditor({
       return item;
     });
 
-    // Kalkulasi ulang subtotal dan total setelah item diubah
+    // calculate new totals after updating the item
     recalculateTotals(updatedItems);
   };
 
-  // ✅ FUNGSI YANG DIPERBARUI: Kalkulasi subtotal dan total yang benar
+  // calculate new totals based on items and optional new tax/service/discount
   const recalculateTotals = (
     items: BillItem[],
     newTax?: number,
@@ -87,13 +86,13 @@ export function BillEditor({
     });
   };
 
-  // ✅ FUNGSI YANG DIPERBARUI: Menggunakan fungsi kalkulasi terpusat
+  // use this function to delete an item and recalculate totals
   const deleteItem = (id: string) => {
     const updatedItems = billData.items.filter((item) => item.id !== id);
     recalculateTotals(updatedItems);
   };
 
-  // ✅ FUNGSI YANG DIPERBARUI: Menambahkan price_per_item
+  // use this function to add a new item and set it for editing
   const addNewItem = () => {
     const newItem: BillItem = {
       id: Date.now().toString(),
@@ -108,7 +107,7 @@ export function BillEditor({
     setEditingItem(newItem.id);
   };
 
-  // ✅ FUNGSI YANG DIPERBARUI: Menggunakan fungsi kalkulasi terpusat
+  // this function updates tax, service charge, or discount and recalculates totals
   const updateTaxAndService = (
     field: "tax" | "serviceCharge" | "discount",
     value: number
@@ -202,7 +201,7 @@ export function BillEditor({
                               className="w-full"
                             />
                           </div>
-                          {/* ✅ INPUT DIUBAH: Mengedit harga satuan */}
+                          {/* edit each price */}
                           <div className="w-full flex flex-row gap-2 items-center">
                             <p className="w-1/3">Price/item:</p>
                             <Input
@@ -227,7 +226,7 @@ export function BillEditor({
                         <div className="font-medium text-gray-900">
                           {item.name}
                         </div>
-                        {/* ✅ TAMPILAN DIUBAH: Menampilkan kalkulasi yang benar */}
+                        {/* show fix calculation */}
                         <div className="text-sm text-gray-600">
                           Qty: {item.quantity} ×{" "}
                           {new Intl.NumberFormat("id-ID", {
@@ -293,7 +292,7 @@ export function BillEditor({
                     id="tax"
                     type="number"
                     step="1"
-                    // Menampilkan nilai pajak sebagai persen. Mencegah error jika subtotal 0.
+                    // show tax as percentage of subtotal
                     value={
                       billData.subtotal > 0
                         ? ((billData.tax / billData.subtotal) * 100)
@@ -301,10 +300,10 @@ export function BillEditor({
                     }
                     onChange={(e) => {
                       const percentage = parseFloat(e.target.value) || 0;
-                      // Hitung nilai pajak absolut dari persen yang dimasukkan
+                      // calculate new tax value based on percentage
                       const newTaxValue =
                         (billData.subtotal * percentage) / 100;
-                      // Panggil fungsi update terpusat
+                      // update tax and recalculate totals
                       updateTaxAndService("tax", newTaxValue);
                     }}
                   />

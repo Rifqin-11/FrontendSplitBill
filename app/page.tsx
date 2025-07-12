@@ -16,10 +16,9 @@ export interface BillItem {
   name: string;
   quantity: number;
   price: number;
-  price_per_item: number; // optional, calculated field
+  price_per_item: number;
   discount?: number;
   assignedTo: string[];
-
 }
 
 export interface PaymentMethod {
@@ -45,6 +44,7 @@ export interface BillData {
 
 }
 
+// Step in the process
 const steps = [
   { id: "upload", title: "Upload Receipt", icon: Upload },
   { id: "edit", title: "Review & Edit", icon: Receipt },
@@ -53,8 +53,6 @@ const steps = [
   { id: "payment", title: "Payment Info", icon: CreditCard },
   { id: "summary", title: "Split Results", icon: Share2 },
 ];
-
-
 
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
@@ -68,13 +66,14 @@ export default function Home() {
     setIsClient(true);
   }, []);
 
+  // handle file upload and OCR extraction
   const handleFileUpload = async (file: File) => {
     const imageUrl = URL.createObjectURL(file);
     setUploadedImage(imageUrl);
 
     try {
       const formData = new FormData();
-      formData.append("image", file); // ✅ cocok dengan backend
+      formData.append("image", file);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/receipt`,
@@ -113,6 +112,7 @@ export default function Home() {
     }
   };
 
+  // Drag and drop handlers
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -143,6 +143,7 @@ export default function Home() {
     fileInputRef.current?.click();
   };
 
+  // Render the current step based on state
   const renderCurrentStep = () => {
     switch (currentStep) {
       case "upload":

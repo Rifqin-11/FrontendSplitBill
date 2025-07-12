@@ -15,6 +15,7 @@ interface ItemAssignmentProps {
 }
 
 export function ItemAssignment({ billData, setBillData, people, onNext, onBack }: ItemAssignmentProps) {
+  // Function to toggle assignment of a person to an item
   const togglePersonForItem = (itemId: string, personId: string) => {
     const updatedItems = billData.items.map(item => {
       if (item.id === itemId) {
@@ -32,6 +33,7 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
     setBillData({ ...billData, items: updatedItems });
   };
 
+  // Function to assign an item to all people
   const assignItemToAll = (itemId: string) => {
     const updatedItems = billData.items.map(item => {
       if (item.id === itemId) {
@@ -53,6 +55,7 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
       minimumFractionDigits: 2,
     }).format(value);
 
+  // Function to clear all assignments for an item
   const clearItemAssignments = (itemId: string) => {
     const updatedItems = billData.items.map(item => {
       if (item.id === itemId) {
@@ -84,6 +87,7 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
         </p>
       </div>
 
+      {/* notification if item not assigned */}
       {!allItemsAssigned && (
         <Card className="mb-6 border-orange-200 bg-orange-50">
           <CardContent className="pt-6">
@@ -110,6 +114,7 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
         </Card>
       )}
 
+      {/* Item assignment cards */}
       <div className="space-y-6">
         {billData.items.map((item) => (
           <Card
@@ -231,6 +236,7 @@ export function ItemAssignment({ billData, setBillData, people, onNext, onBack }
         ))}
       </div>
 
+      {/* Navigation buttons */}
       <div className="flex space-x-4 mt-8">
         <Button variant="outline" onClick={onBack} className="flex-1">
           <ArrowLeft className="h-5 w-5 mr-2" />

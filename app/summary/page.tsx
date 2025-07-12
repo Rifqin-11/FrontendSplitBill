@@ -64,6 +64,7 @@ export default function SummaryPage() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [error, setError] = useState("");
 
+  // Fetch data when component mounts or id changes
   useEffect(() => {
     if (!id) return;
     const fetchData = async () => {
@@ -83,6 +84,7 @@ export default function SummaryPage() {
     fetchData();
   }, [id]);
 
+  // Format numbers as Indonesian Rupiah
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -90,6 +92,7 @@ export default function SummaryPage() {
       minimumFractionDigits: 2,
     }).format(value);
 
+  // Get payment method label based on type
   const getPaymentMethodLabel = (method: PaymentMethod) => {
     const labels: Record<string, string> = {
       gopay: "GoPay",
@@ -113,8 +116,7 @@ export default function SummaryPage() {
   };
 
   const calculatePersonSummaries = (): PersonSummary[] => {
-    // 1️⃣ Hitung dulu per-person sama seperti di BillSummary.tsx,
-    //    termasuk memperhitungkan quantity * unit price:
+    // calculate individual summaries
     const personSummaries = people.map((person) => {
       const personItems = billData!.items
         .filter((item) => item.assignedTo.includes(person.id))
@@ -131,7 +133,7 @@ export default function SummaryPage() {
         0
       );
 
-      // proporsi berdasarkan subtotal
+      // proportion of items to subtotal
       const itemsProportion =
         billData!.subtotal > 0 ? itemsTotal / billData!.subtotal : 0;
       const taxPortion = billData!.tax * itemsProportion;
@@ -152,7 +154,7 @@ export default function SummaryPage() {
       };
     });
 
-    // 2️⃣ Hitung subtotal untuk item yang belum dibagikan
+    // calculate unassigned items
     const unassignedItems = billData!.items.filter(
       (item) => item.assignedTo.length === 0
     );
@@ -161,7 +163,7 @@ export default function SummaryPage() {
       0
     );
 
-    // 3️⃣ Jika ada, hitung porsi pajak/service/discount, lalu bagi rata ke semua orang
+    // if there are unassigned items, distribute their cost evenly
     if (unassignedSubtotal > 0 && billData!.subtotal > 0) {
       const unassignedProportion = unassignedSubtotal / billData!.subtotal;
       const unassignedTax = billData!.tax * unassignedProportion;
