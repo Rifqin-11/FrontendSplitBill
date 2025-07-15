@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Users, Calculator, Share2, ChevronRight, Receipt, Camera, CreditCard } from 'lucide-react';
+import { Upload, Users, Calculator, Share2, ChevronRight, Receipt, Camera, CreditCard, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BillEditor } from '@/components/BillEditor';
@@ -61,56 +61,60 @@ export default function Home() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   // handle file upload and OCR extraction
-  const handleFileUpload = async (file: File) => {
-    const imageUrl = URL.createObjectURL(file);
-    setUploadedImage(imageUrl);
+const handleFileUpload = async (file: File) => {
+  setIsUploading(true); // ← Start loading
+  const imageUrl = URL.createObjectURL(file);
+  setUploadedImage(imageUrl);
 
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/receipt`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/receipt`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
-      if (!response.ok) throw new Error("Failed to process receipt");
+    if (!response.ok) throw new Error("Failed to process receipt");
 
-      const extracted = await response.json();
+    const extracted = await response.json();
 
-      const formattedData: BillData = {
-        items: extracted.parsed.items.map((item: any, index: number) => ({
-          id: String(index + 1),
-          name: item.name,
-          quantity: item.quantity,
-          price_per_item: item.price_per_item,
-          price: item.price,
-          assignedTo: [],
-        })),
-        subtotal: extracted.parsed.subtotal,
-        tax: extracted.parsed.tax,
-        serviceCharge: extracted.parsed.service_charge ?? 0,
-        discount: extracted.parsed.discount ?? 0,
-        total: extracted.parsed.total,
-      };
+    const formattedData: BillData = {
+      items: extracted.parsed.items.map((item: any, index: number) => ({
+        id: String(index + 1),
+        name: item.name,
+        quantity: item.quantity,
+        price_per_item: item.price_per_item,
+        price: item.price,
+        assignedTo: [],
+      })),
+      subtotal: extracted.parsed.subtotal,
+      tax: extracted.parsed.tax,
+      serviceCharge: extracted.parsed.service_charge ?? 0,
+      discount: extracted.parsed.discount ?? 0,
+      total: extracted.parsed.total,
+    };
 
+    setBillData(formattedData);
+    setCurrentStep("edit");
+  } catch (error) {
+    console.error("OCR extraction failed:", error);
+    toast.error("Failed to process receipt. Please try again.");
+  } finally {
+    setIsUploading(false); // ← Stop loading
+  }
+};
 
-      setBillData(formattedData);
-      setCurrentStep("edit");
-    } catch (error) {
-      console.error("OCR extraction failed:", error);
-      toast.error("Failed to process receipt. Please try again.");
-    }
-  };
 
   // Drag and drop handlers
   const handleDragOver = (e: React.DragEvent) => {
@@ -182,9 +186,22 @@ export default function Home() {
                     className="hidden"
                   />
                   <label htmlFor="receipt-upload">
-                    <Button onClick={triggerFileInput} size="lg">
-                      <Upload className="h-5 w-5 mr-2" />
-                      Choose Receipt Image
+                    <Button
+                      onClick={triggerFileInput}
+                      size="lg"
+                      disabled={isUploading}
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="animate-spin w-5 h-5 mr-2" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-5 w-5 mr-2" />
+                          Choose Receipt Image
+                        </>
+                      )}
                     </Button>
                   </label>
                 </div>
