@@ -1,40 +1,50 @@
+import { Toaster } from "@/components/ui/sonner";
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
-import { Toaster } from '@/components/ui/sonner';
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+const inter = Inter({ subsets: ["latin"] });
 
-const inter = Inter({ subsets: ['latin'] });
+const SITE_URL = "https://splitbill.rifqinaufal11.studio";
 
 export const metadata: Metadata = {
-  title: "Split Bill Receipt - Bagi Tagihan Otomatis dari Struk",
-  description:
-    "Aplikasi web pintar untuk membagi tagihan restoran secara otomatis dari struk belanja. Unggah struk, tetapkan item ke orang, dan hitung pembagian biaya dengan mudah dan adil.",
-  icons: {
-    icon: "/favicon.png",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Split Bill Online – Bagi Tagihan Otomatis dari Struk",
+    template: "%s | Split Bill Online",
   },
+  description:
+    "Aplikasi split bill online untuk membagi tagihan restoran secara otomatis dari struk. Unggah struk, tetapkan item per orang, dan hitung pembagian biaya dengan mudah, cepat, dan adil.",
   keywords: [
-    "split bill",
+    "split bill online",
     "bagi tagihan",
+    "bagi tagihan restoran",
     "OCR struk",
-    "bagi biaya makan",
-    "aplikasi struk restoran",
     "pembagian tagihan otomatis",
-    "scan receipt split bill",
-    "web split bill teman",
+    "scan struk",
+    "aplikasi split bill",
+    "bagi biaya makan",
   ],
+  icons: { icon: "/favicon.png" },
   authors: [{ name: "Rifqi Naufal", url: "https://github.com/Rifqin-11" }],
   creator: "Rifqi Naufal",
-  metadataBase: new URL("https://splitbill.rifqinaufal11.studio/"),
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: "index,follow",
+  },
   openGraph: {
-    title: "Split Bill Receipt - Bagi Tagihan Otomatis dari Struk",
+    title: "Split Bill Online – Bagi Tagihan Otomatis dari Struk",
     description:
-      "Web app yang memudahkan pembagian tagihan makanan dengan upload struk dan pembagian item per orang.",
-    url: "https://splitbill.rifqinaufal11.studio/",
+      "Web app untuk membagi tagihan makanan dari struk: upload, assign item ke teman, dan hitung otomatis. Mudah, cepat, adil.",
+    url: "/",
     siteName: "Split Bill Receipt",
     images: [
       {
-        url: "https://splitbill.rifqinaufal11.studio/og-image.jpg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Split Bill Receipt Preview",
@@ -42,9 +52,15 @@ export const metadata: Metadata = {
     ],
     locale: "id_ID",
     type: "website",
-  }
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Split Bill Online – Bagi Tagihan Otomatis dari Struk",
+    description:
+      "Bagi tagihan otomatis dari struk dengan mudah. Unggah struk, pilih item per orang, hasil adil & transparan.",
+    images: ["/og-image.jpg"],
+  },
 };
-
 
 export default function RootLayout({
   children,
@@ -52,9 +68,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-      <Toaster />
+    <html lang="id">
+      <body className={inter.className}>
+        {children}
+        <Toaster />
+        {/* JSON-LD: WebApplication */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "Split Bill Online",
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Web",
+              url: SITE_URL,
+              description:
+                "Aplikasi split bill online untuk membagi tagihan restoran otomatis dari struk.",
+              image: `${SITE_URL}/og-image.jpg`,
+              author: { "@type": "Person", name: "Rifqi Naufal" },
+              offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
+            }),
+          }}
+        />
+      </body>
     </html>
   );
 }
